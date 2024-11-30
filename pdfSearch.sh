@@ -4,6 +4,7 @@
 #    -- polprog
 # Version 1.0: oct 2024
 # version 2.0: Nov 2024 Mohr hacks added, Rue.
+# version 3.0: Nov 2024 If term was on command line and there was only 1 result, just open it.
 
 PDFVIEWER=acroread
 term=""
@@ -54,8 +55,13 @@ doit() {
 	return 0;
     fi
 
+    choice=0
+  
+    if [ $quick -ne 1 -o $i -ne 1 ]; then
     # Show the choice menu. this returns a single number that you chose
-    choice=$(echo dialog --backtitle \"pdfsearch v2.0\" --stdout --menu \"Search results for \\\"$term\\\":\" 0 0 $i "$listopts" | sh)
+      choice=$(echo dialog --backtitle \"pdfsearch v2.0\" --stdout --menu \"Search results for \\\"$term\\\":\" 0 0 $i "$listopts" | sh)
+    fi
+    
     if [ $? -ne 0 ]; then clear; return 0; fi
     
     #echo "user chose $choice"
@@ -67,9 +73,11 @@ doit() {
 # run doit as long as it returns 0 
 if [ $# -ne 0 ]; then
   term=$1
+  quick=1
   doit || break;
   clear
 else 
+ quick=0
   while true; do 
     getTerm || break ;
     doit || break ;
